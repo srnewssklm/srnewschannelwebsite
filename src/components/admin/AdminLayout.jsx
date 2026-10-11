@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { LayoutDashboard, FileText, Tag, UserCircle, AlertCircle, TrendingUp, Video, Radio, Image as ImageIcon, Home, Users, Bell, Menu, X, ChevronRight, AlertTriangle, MonitorPlay, MessageCircle } from "lucide-react"
+import { LayoutDashboard, FileText, Tag, UserCircle, AlertCircle, TrendingUp, Video, Radio, Image as ImageIcon, Home, Users, Bell, Menu, X, ChevronRight, AlertTriangle, MonitorPlay, MessageCircle, LogOut, User } from "lucide-react"
 import { useNewsAdminStore } from "../../store/newsAdminStore"
 import { supabase } from "../../lib/supabase"
+import toast from "react-hot-toast"
 
 const NAV = [
   { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -51,6 +52,22 @@ function Sidebar({ pathname, onNavClick, onToggle }) {
 export default function AdminLayout({ children }) {
   // Default: open on desktop (lg+), always closed on mobile
   const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024)
+  const [user, setUser] = useState(null)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef(null)
+
+  // Get current user
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user || null)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   // Close sidebar when resizing to mobile
   useEffect(() => {
@@ -69,6 +86,7 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     const handler = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false)
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false)
     }
     document.addEventListener("mousedown", handler)
     document.addEventListener("touchstart", handler)
@@ -79,10 +97,21 @@ export default function AdminLayout({ children }) {
   const handleBellClick = () => {
     if (notifOpen) {
       // Closing — clear all notifications now (read from store directly to avoid stale closure)
-      const current = useAdminStore.getState().notifications
+      const current = useNewsAdminStore.getState().notifications
       current.forEach(n => clearNotification(n.id))
     }
     setNotifOpen(o => !o)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      toast.success('Logged out successfully')
+      navigate('/admin/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error('Failed to logout')
+    }
   }
 
   const getNotifLink = (n) => {
@@ -186,6 +215,48 @@ export default function AdminLayout({ children }) {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* User Profile Menu */}
+            {user && (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(o => !o)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#1B2B5E] flex items-center justify-center text-white text-sm font-medium">
+                    {user.email?.[0]?.toUpperCase() || 'A'}
+                  </div>
+                  <span className="text-sm text-gray-700 hidden sm:block max-w-32 truncate">
+                    {user.email}
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-[100] overflow-hidden"
+                    >
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-medium text-gray-900">Signed in as</p>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
+                      </div>
+                      <div className="p-2">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <LogOut size={16} />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
