@@ -21,6 +21,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'))
 const TeamPage = lazy(() => import('./pages/TeamPage'))
 const CareersPage = lazy(() => import('./pages/CareersPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
+const AdminLogin = lazy(() => import('./pages/AdminLogin'))
 
 // Admin pages (code split)
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
@@ -52,6 +53,13 @@ export default function App() {
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
+          {/* Admin Login (no layout) */}
+          <Route path="/admin/login" element={
+            <Suspense fallback={<PageLoader />}>
+              <AdminLogin />
+            </Suspense>
+          } />
+
           {/* Admin routes — own layout, no news navbar/footer */}
           <Route path="/admin/*" element={
             <AdminRoute>
