@@ -4,10 +4,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// CORS headers
+// CORS headers - properly configured for frontend origin
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Origin': 'https://srnewschannelwebsite.vercel.app',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-auth, accept',
+  'Access-Control-Max-Age': '86400',
 }
 
 // Type definitions
@@ -187,9 +189,12 @@ async function sendWhatsAppMessage(
 
 // Main handler
 serve(async (req) => {
-  // Handle CORS preflight
+  // Handle CORS preflight - MUST be first, before any other logic
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { 
+      status: 200,
+      headers: corsHeaders 
+    })
   }
 
   try {
