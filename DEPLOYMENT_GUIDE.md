@@ -1,230 +1,322 @@
-# SR TV NEWS CHANNEL - Complete Deployment Guide
+# Complete Deployment Guide
+## Migrating to New Supabase Account
 
-## 🎉 TRANSFORMATION COMPLETE!
+This guide walks you through deploying your e-commerce project with a fresh Supabase account.
 
-Your e-commerce website has been successfully transformed into a professional TV news channel!
+---
 
-## ✅ What's Been Completed
+## 📋 Prerequisites
 
-### 1. Database Architecture
-- **Complete schema** with all tables
-- **Helper functions** for views, clicks tracking
-- **RLS policies** for security
-- **8 default categories** ready to use
+- [ ] New Supabase account created at https://supabase.com
+- [ ] Supabase CLI installed: `npm install -g supabase`
+- [ ] Git repository ready
+- [ ] Node.js and npm installed
 
-### 2. Backend Services
-- Full news data API (`newsService.js`)
-- All CRUD operations
-- Search, filtering, trending logic
+---
 
-### 3. Admin Panel (Fully Functional)
-- ✅ Dashboard with statistics
-- ✅ News Management (full CRUD)
-- ✅ Reporter Management (full CRUD)
-- ✅ Updated navigation and branding
+## 🚀 Step-by-Step Deployment
 
-### 4. Frontend Website
-- ✅ Professional News Navbar with live time/date
-- ✅ Breaking News Ticker (animated)
-- ✅ News Homepage with hero section
-- ✅ News Article Detail Page
-- ✅ Category navigation
-- ✅ Trending sidebar
-- ✅ Social sharing
-- ✅ Responsive design
+### 1️⃣ Create New Supabase Project
 
-## 🚀 DEPLOYMENT STEPS
+1. Go to https://app.supabase.com
+2. Click **"New Project"**
+3. Fill in:
+   - **Name**: Your project name
+   - **Database Password**: Save this securely!
+   - **Region**: Choose closest to your users
+4. Wait for project to be ready (~2 minutes)
+5. Note down:
+   - **Project URL**: `https://xxxxx.supabase.co`
+   - **Project Reference ID**: Found in Settings > General
+   - **Anon Key**: Found in Settings > API
+   - **Service Role Key**: Found in Settings > API (keep secret!)
 
-### STEP 1: Setup Database (CRITICAL - Do This First!)
+---
 
-1. **Go to Supabase Dashboard**
-   - Visit: https://supabase.com/dashboard
-   - Select your project
+### 2️⃣ Run Database Migration
 
-2. **Run SQL Scripts**
-   ```
-   Open SQL Editor → New Query
-   ```
-   
-   **First**, copy and paste contents of:
-   - `news-database-setup.sql`
-   - Click "Run"
-   - Wait for success message
+1. Open your Supabase project dashboard
+2. Go to **SQL Editor** in the left sidebar
+3. Click **New Query**
+4. Open `complete-database-migration.sql` from your project
+5. Copy and paste the **entire contents** into the SQL editor
+6. Click **Run** (or press F5)
+7. Wait for completion (should see "Success" message)
 
-   **Then**, copy and paste contents of:
-   - `news-database-functions.sql`
-   - Click "Run"
-   - Wait for success message
+✅ **Verify**: Check that tables were created:
+- Go to **Table Editor** and you should see all tables listed
 
-3. **Verify Tables Created**
-   - Go to Table Editor
-   - You should see these tables:
-     - news
-     - reporters
-     - categories (with 8 default categories)
-     - videos
-     - breaking_news
-     - live_tv_config
-     - advertisements
-     - homepage_config
-     - news_site_settings
+---
 
-### STEP 2: Start Development Server
+### 3️⃣ Update Frontend Environment Variables
 
-```bash
-npm run dev
+Update your `.env` file with the new Supabase credentials:
+
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Important: DO NOT add WhatsApp credentials here!
+# They go in Supabase secrets (see step 5)
 ```
 
-### STEP 3: Login to Admin Panel
+⚠️ **Never commit `.env` to Git!** Make sure it's in `.gitignore`
 
-1. Go to: `http://localhost:5173/admin`
-2. Login with your admin credentials
-3. You'll see the SR TV NEWS Admin Dashboard
+---
 
-### STEP 4: Add Your First Content
+### 4️⃣ Link Supabase CLI to Project
 
-#### Create a Reporter
-1. Go to `/admin/reporters`
-2. Click "Add Reporter"
-3. Fill in:
-   - Name (required)
-   - Upload photo
-   - Designation (e.g., "Senior Reporter")
-   - Location (e.g., "Hyderabad")
-   - Status: Active
-4. Click "Create Reporter"
+```powershell
+# Navigate to project directory
+cd d:\sailproject\srnewestv
 
-#### Create News Article
-1. Go to `/admin/news`
-2. Click "Add News"
-3. Fill in:
-   - Title (required)
-   - Short Description
-   - Content (full article text)
-   - Upload Featured Image
-   - Select Category
-   - Select Reporter
-   - Status: Published
-   - Check "Breaking" or "Featured" if needed
-4. Click "Create News"
+# Login to Supabase CLI
+supabase login
 
-### STEP 5: View Your News Website
+# Link to your project
+supabase link --project-ref YOUR_PROJECT_REF
 
-1. Go to: `http://localhost:5173/`
-2. You'll see:
-   - **Homepage** with your published news
-   - **Breaking ticker** (if you added breaking news)
-   - **Category navigation**
-   - **Trending sidebar**
+# Verify link
+supabase projects list
+```
 
-3. Click on any article to view the full news article page
+---
 
-## 📋 Admin Panel Features
+### 5️⃣ Deploy Edge Functions
 
-### Dashboard (`/admin`)
-- Total news statistics
-- Publishing activity chart
-- Category distribution
-- Top reporters
-- Recent published news
+```powershell
+# Deploy WhatsApp campaign sender function
+supabase functions deploy send-whatsapp-campaign
 
-### News Management (`/admin/news`)
-- Create/Edit/Delete news articles
-- Publish/Unpublish
-- Mark as Breaking/Featured/Trending
-- Filter by status and category
-- Search by title
+# Deploy WhatsApp webhook function
+supabase functions deploy whatsapp-webhook
 
-### Reporter Management (`/admin/reporters`)
-- Add/Edit/Delete reporters
-- Upload reporter photos
-- Manage social links
-- Set active/inactive status
+# Verify deployment
+supabase functions list
+```
 
-## 🎨 Design Features
+✅ **Expected output**: Both functions should show as "deployed"
 
-### Colors
-- **Primary**: Deep Navy Blue (#1B2B5E)
-- **Accent**: Bright Red (#DC2626)
-- **Background**: White & Gray
-- **Text**: Dark Gray (#1A1A2E)
+---
 
-### Responsive
-- ✅ Desktop (3-column layout)
-- ✅ Tablet (2-column layout)
-- ✅ Mobile (hamburger menu, single column)
+### 6️⃣ Set Supabase Secrets (WhatsApp API)
 
-### Components
-- ✅ Breaking News Ticker (red, animated)
-- ✅ Dynamic Navbar with categories
-- ✅ News Cards (3 sizes: large, medium, small)
-- ✅ Trending Sidebar
-- ✅ Social Share Buttons
-- ✅ Reporter Bio Section
+```powershell
+# Set WhatsApp Access Token
+supabase secrets set WHATSAPP_ACCESS_TOKEN="your_meta_access_token"
 
-## 🔧 What's Still Missing (Optional Enhancements)
+# Set Phone Number ID
+supabase secrets set WHATSAPP_PHONE_NUMBER_ID="your_phone_number_id"
 
-### Additional Admin Pages
-These work but aren't created yet (the UI will show placeholder routes):
-- `/admin/categories` - Category management
-- `/admin/breaking-news` - Breaking news ticker management
-- `/admin/trending-news` - Trending order management
-- `/admin/videos` - Video management
-- `/admin/live-tv` - Live TV stream configuration
-- `/admin/advertisements` - Ad management
-- `/admin/homepage` - Homepage hero configuration
+# Set Business Account ID
+supabase secrets set WHATSAPP_BUSINESS_ACCOUNT_ID="your_business_account_id"
 
-### Additional Frontend Pages
-- Category listing page (`/category/:slug`)
-- Latest news page (`/latest`)
-- Videos page (`/videos`)
-- Live TV page (`/live-tv`)
-- Search results page (`/search`)
+# Set Webhook Verify Token (create a random string)
+supabase secrets set WHATSAPP_WEBHOOK_VERIFY_TOKEN="your_random_verify_token_here"
 
-### Would you like me to create these?
-Just say:
-- "Create all admin pages" - I'll build the remaining 7 admin CRUD pages
-- "Create category page" - I'll build the category news listing
-- "Create videos page" - I'll build video management
-- "All of it" - I'll complete everything
+# Verify secrets were set
+supabase secrets list
+```
 
-## 🎯 Current Status Summary
+📝 **How to get WhatsApp credentials**: See `WHATSAPP_SETUP_GUIDE.md` Part 1
 
-**Database**: ✅ 100% Complete
-**Backend**: ✅ 100% Complete
-**Admin Panel**: ✅ 60% Complete (core features working)
-**Frontend**: ✅ 50% Complete (homepage and article page working)
-**Overall**: ✅ 70% Complete
+---
 
-## 📞 Test It Now!
+### 7️⃣ Build and Deploy Frontend
 
-1. Run SQL scripts in Supabase
-2. Start dev server: `npm run dev`
-3. Create a reporter in `/admin/reporters`
-4. Create a news article in `/admin/news`
-5. Visit homepage `/` to see your article!
+#### Option A: Deploy to Vercel (Recommended)
 
-## 🚨 Common Issues
+1. Push code to GitHub:
+```powershell
+git add .
+git commit -m "Initial deployment with new Supabase"
+git push origin main
+```
 
-### "Table does not exist"
-- You forgot to run the SQL scripts in Supabase
-- Solution: Run `news-database-setup.sql` first
+2. Go to https://vercel.com
+3. Click **"Import Project"**
+4. Select your GitHub repository
+5. Configure:
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+6. Add environment variables:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+7. Click **Deploy**
 
-### "Admin routes not working"
-- Check that you're logged in
-- Check that your user has admin access in Supabase
+#### Option B: Deploy to Netlify
 
-### "No news showing"
-- Make sure you published the article (status = "published")
-- Check that you're viewing the correct category
+1. Push code to GitHub (same as above)
+2. Go to https://netlify.com
+3. Click **"Add new site"** > **"Import existing project"**
+4. Select your repository
+5. Configure:
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
+6. Add environment variables (same as Vercel)
+7. Click **Deploy**
 
-## 🎉 You're Ready!
+---
 
-Your news channel is now live locally. When you're ready to deploy to production:
+### 8️⃣ Configure WhatsApp Webhook (Optional)
 
-1. Build: `npm run build`
-2. Deploy `dist` folder to Vercel/Netlify
-3. Update Supabase redirect URLs for production domain
-4. Done!
+If using WhatsApp messaging:
 
-**Enjoy your new SR TV NEWS CHANNEL! 📺📰**
+1. Go to Meta Developer Console: https://developers.facebook.com
+2. Select your app
+3. Go to **WhatsApp** > **Configuration**
+4. Click **Edit** next to Webhook
+5. Enter:
+   - **Callback URL**: `https://YOUR_PROJECT_REF.supabase.co/functions/v1/whatsapp-webhook`
+   - **Verify Token**: Same token you set in secrets above
+6. Click **Verify and Save**
+7. Subscribe to webhook fields: `messages`, `message_status`
+
+---
+
+### 9️⃣ Set Up Storage Buckets (Auto-created)
+
+The migration script automatically creates these buckets:
+- ✅ `product-images` (public) - for product photos
+- ✅ `payment-screenshots` (private) - for UPI payment proofs
+
+**Verify buckets exist**:
+1. Go to **Storage** in Supabase dashboard
+2. Check both buckets are listed
+
+---
+
+### 🔟 Create Admin Users
+
+Run this SQL in Supabase SQL Editor to make yourself an admin:
+
+```sql
+-- Replace with your actual email
+update auth.users 
+set raw_user_meta_data = raw_user_meta_data || '{"role":"admin"}'::jsonb
+where email = 'your-email@example.com';
+```
+
+Or use the email whitelist (already configured in RLS policies):
+- sailendrakondapalli@gmail.com
+- adduriaswani@gmail.com
+- susmithajewlaries@gmail.com
+- nashejewels@gmail.com
+- naveenreddygandluri51@gmail.com
+- aswaniadduri11@gmail.com
+- ssbmanogna@gmail.com
+
+---
+
+## ✅ Verification Checklist
+
+After deployment, verify everything works:
+
+### Database
+- [ ] All tables visible in Table Editor
+- [ ] RLS policies enabled
+- [ ] Storage buckets created
+
+### Frontend
+- [ ] Site loads without errors
+- [ ] Users can sign up/login
+- [ ] Products display correctly
+- [ ] Cart functionality works
+- [ ] Wishlist functionality works
+
+### Admin Panel
+- [ ] Can access `/admin` routes
+- [ ] Can add/edit products
+- [ ] Can view orders
+- [ ] Can manage promo codes
+- [ ] WhatsApp messaging page loads
+
+### Edge Functions
+- [ ] Functions listed in Supabase dashboard
+- [ ] Secrets configured
+- [ ] Can send test WhatsApp campaign
+
+---
+
+## 🐛 Troubleshooting
+
+### "Invalid API key" Error
+- Check that `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are correct
+- Rebuild and redeploy after changing env vars
+
+### "RLS policy violation" Error
+- Verify your email is in the admin whitelist
+- OR add admin role to your user (see step 10)
+
+### Edge Function Not Working
+- Check function logs: `supabase functions logs send-whatsapp-campaign`
+- Verify secrets are set: `supabase secrets list`
+- Redeploy function: `supabase functions deploy send-whatsapp-campaign --no-verify-jwt`
+
+### WhatsApp Messages Not Sending
+- Verify WhatsApp credentials are correct
+- Check Edge Function logs for errors
+- Ensure phone numbers are in E.164 format
+- Verify webhook is configured in Meta Console
+
+### Storage Upload Fails
+- Check bucket exists in Storage tab
+- Verify RLS policies allow uploads
+- Check file size (limit: 10MB for payment screenshots)
+
+---
+
+## 📚 Additional Resources
+
+- **Supabase Docs**: https://supabase.com/docs
+- **WhatsApp Cloud API**: https://developers.facebook.com/docs/whatsapp/cloud-api
+- **Meta Developer Console**: https://developers.facebook.com
+
+---
+
+## 🔐 Security Notes
+
+### Never Commit These Files:
+```
+.env
+.env.local
+.env.production
+supabase/.env
+```
+
+### Keep These Secret:
+- Supabase Service Role Key (never use in frontend!)
+- WhatsApp Access Token
+- Database Password
+- Webhook Verify Token
+
+### Safe to Commit:
+- Supabase URL (public)
+- Supabase Anon Key (public, protected by RLS)
+- All `.sql` migration files
+- All frontend code
+
+---
+
+## 📞 Support
+
+If you encounter issues:
+1. Check browser console for errors (F12)
+2. Check Supabase logs in dashboard
+3. Check Edge Function logs: `supabase functions logs <function-name>`
+4. Review this deployment guide again
+
+---
+
+## 🎉 You're Done!
+
+Your e-commerce platform with admin panel and WhatsApp messaging is now live!
+
+**Access your sites:**
+- Customer Site: `https://your-site.vercel.app`
+- Admin Panel: `https://your-site.vercel.app/admin`
+- Supabase Dashboard: `https://app.supabase.com/project/YOUR_REF`
+
+Happy selling! 🚀

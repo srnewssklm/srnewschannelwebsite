@@ -28,6 +28,7 @@ const AdminNews = lazy(() => import('./pages/admin/AdminNews'))
 const AdminCategories = lazy(() => import('./pages/admin/AdminCategories'))
 const AdminReporters = lazy(() => import('./pages/admin/AdminReporters'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminWhatsApp = lazy(() => import('./pages/admin/AdminWhatsApp'))
 
 const PageLoader = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
@@ -63,6 +64,7 @@ export default function App() {
                       <Route path="categories" element={<AdminCategories />} />
                       <Route path="reporters" element={<AdminReporters />} />
                       <Route path="users" element={<AdminUsers />} />
+                      <Route path="whatsapp" element={<AdminWhatsApp />} />
                     </Routes>
                   </Suspense>
                 </ErrorBoundary>

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { LayoutDashboard, FileText, Tag, UserCircle, AlertCircle, TrendingUp, Video, Radio, Image as ImageIcon, Home, Users, Bell, Menu, X, ChevronRight, AlertTriangle, MonitorPlay } from "lucide-react"
+import { LayoutDashboard, FileText, Tag, UserCircle, AlertCircle, TrendingUp, Video, Radio, Image as ImageIcon, Home, Users, Bell, Menu, X, ChevronRight, AlertTriangle, MonitorPlay, MessageCircle } from "lucide-react"
 import { useNewsAdminStore } from "../../store/newsAdminStore"
 import { supabase } from "../../lib/supabase"
 
@@ -11,6 +11,7 @@ const NAV = [
   { path: "/admin/categories", label: "Categories", icon: Tag },
   { path: "/admin/reporters", label: "Reporters", icon: UserCircle },
   { path: "/admin/users", label: "Users", icon: Users },
+  { path: "/admin/whatsapp", label: "Bulk WhatsApp", icon: MessageCircle },
 ]
 
 function Sidebar({ pathname, onNavClick, onToggle }) {
