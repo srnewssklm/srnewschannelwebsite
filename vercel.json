@@ -5,7 +5,7 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/((?!sitemap\\.xml|robots\\.txt|google.*\\.html|favicon\\.svg|icons\\.svg).*)",
+      "source": "/((?!api|sitemap\\.xml|robots\\.txt|google.*\\.html|favicon\\.svg|icons\\.svg).*)",
       "destination": "/index.html"
     }
   ],
